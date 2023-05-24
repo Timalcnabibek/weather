@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="new2.css">
+  
+      <a href="hebhagwan5.php"><button type="button">for the past records</button></a>
+<style>
+  body {
+    background: url(sunflower.jpg) center center fixed;
+    background-size: cover;
+
+    background-repeat: no-repeat;
+    background-position:center;
+  }
+
+  .container {
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    align-items: center;
+    margin-top: 120px;
+  }
+
+  
+
+  .location {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  label {
+    margin-right: 10px;
+  }
+
+  input[type="text"] {
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+  }
+
+  button {
+    padding: 5px 10px;
+    font-size: 16px;
+    background-color: #e18e07;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .weather-info {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+
+  .temperature {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .temperature img {
+    margin-right: 10px;
+    width: 50px;
+    height: 50px;
+  }
+
+  .conditions {
+    margin-bottom: 20px;
+  }
+
+  .humidity,
+  .wind-speed {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .humidity span,
+  .wind-speed span {
+    margin-right: 10px;
+  }
+
+  .container .btn {
+    margin-top: 30px;
+    float: right;
+    background-color: rgb(83, 132, 34);
+    border: 1px solid black;
+    border-radius: 20px;
+  }
+
+
+  .condi{
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  .weather-info h2{
+    text-align: center;
+  }
+  #date{
+    font-weight: 800;
+    font-size: 20px;
+    font-style:oblique;
+  }
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="weather-info">
+      <h2 style="font-size: 35px;">Weather Information</h2>
+    </div>
+    <div>
+      <div>
+        <p id="date"></p>
+        <label for="city" style="font-weight:900;font-size:20px;">City:</label>
+        <input type="text" id="city" placeholder="Enter a city">
+        <button id="submit">Get Weather</button>
+      </div>
+      <div class="condi" style="margin-top: 0;">
+        <p class="temperature" style="margin-bottom: 0;"><img src="" alt="Weather Icon"> <span id="temp"></span>&deg;F </p>
+        <p style="margin-left:40px;margin-bottom: 0;"> <span id="conditions"></span></p>
+        <p style="margin-top: 40px;">Humidity:   <span id="humidity"></span></p>
+        <p style="margin-top: 40px;"> Wind speed:  <span id="wind-speed"></span></p>
+        <p id="error-message"></p>
+      </div>
+    </div>
+    <button id="clear-storage">Clear Local Storage</button>
+  </div>
+  
+
+
+    <script>
+      const clearStorageButton = document.getElementById('clear-storage');
+      clearStorageButton.addEventListener('click', () => {
+        localStorage.clear();
+        location.reload(); // Refreshes the page to clear the displayed weather data
+      });
+
+      window.addEventListener('load', () => {
+        const cityInput = document.getElementById('city');
+        cityInput.value = 'Mesa';
+
+        const currentCity = 'Mesa'; // Default city if no data is stored
+        const weatherData = localStorage.getItem(currentCity);
+
+        if (weatherData) {
+          // Weather data exists in localStorage for the current city
+          const parsedWeatherData = JSON.parse(weatherData);
+          updateWeather(parsedWeatherData);
+        } else {
+          // Weather data is not stored in localStorage for the current city
+          getWeather('Mesa');
+        }
+      });
+
+      function getWeather(city) {
+        const apiKey = 'f2d3250979dd69e544ddafb8ed2e7225';
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`;
+
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            const tempElement = document.getElementById('temp');
+            const iconElement = document.querySelector('.temperature img');
+            const conditionsElement = document.getElementById('conditions');
+            const humidityElement = document.getElementById('humidity');
+            const windElement = document.getElementById('wind-speed');
+
+            tempElement.innerText = Math.round(data.main.temp);
+            iconElement.src = `https://openweathermap.org/img/w/${data.weather[0].icon}.png`;
+            conditionsElement.innerText = data.weather[0].description;
+            humidityElement.innerText = `${data.main.humidity}%`;
+            windElement.innerText = `${data.wind.speed} mph`;
+
+            // Store weather data in localStorage with city name as key
+            const weatherData = {
+              temperature: Math.round(data.main.temp),
+              icon: `https://openweathermap.org/img/w/${data.weather[0].icon}.png`,
+              conditions: data.weather[0].description,
+              humidity: `${data.main.humidity}%`,
+              windSpeed: `${data.wind.speed} mph`,
+              timestamp: new Date().getTime() // Store the timestamp of when the data was fetched
+            };
+
+            localStorage.setItem(city, JSON.stringify(weatherData));
+
+            // Update weather information
+            updateWeather(weatherData);
+          })
+          .catch(error => {
+            console.log(error);
+            const errorElement = document.getElementById('error-message');
+            errorElement.innerText = 'Failed to fetch weather data';
+          });
+      }
+
+      function updateWeather(weatherData) {
+        const tempElement = document.getElementById('temp');
+        const iconElement = document.querySelector('.temperature img');
+        const conditionsElement = document.getElementById('conditions');
+        const humidityElement = document.getElementById('humidity');
+        const windElement = document.getElementById('wind-speed');
+
+        tempElement.innerText = weatherData.temperature;
+        iconElement.src = weatherData.icon;
+        conditionsElement.innerText = weatherData.conditions;
+        humidityElement.innerText = weatherData.humidity;
+        windElement.innerText = weatherData.windSpeed;
+      }
+
+      const submitButton = document.getElementById('submit');
+      submitButton.addEventListener('click', () => {
+        const city = document.getElementById('city').value;
+        const weatherData = localStorage.getItem(city);
+
+        if (weatherData) {
+          // Weather data exists in localStorage for the searched city
+          const parsedWeatherData = JSON.parse(weatherData);
+          updateWeather(parsedWeatherData);
+        } else {
+          // Weather data is not stored in localStorage for the searched city
+          getWeather(city);
+        }
+      });
+
+      const dateElement = document.getElementById('date');
+
+      function updateDate() {
+        const now = new Date();
+        const options = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        };
+        const date = now.toLocaleDateString('en-US', options);
+        const time = now.toLocaleTimeString('en-US', {
+          timeStyle: 'short'
+        });
+        dateElement.textContent = date;
+      }
+
+      setInterval(updateDate, 1000);
+
+      // Check if the stored data is outdated
+      function isDataOutdated(weatherData) {
+        const timestamp = weatherData.timestamp;
+        const currentTimestamp = new Date().getTime();
+        const timeDiff = currentTimestamp - timestamp;
+        const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+        // Check if the stored data is older than 1 hour
+        return hoursDiff >= 1;
+      }
+
+      // Handle offline and online mode
+      function handleOfflineMode() {
+        const errorElement = document.getElementById('error-message');
+        errorElement.innerText = 'No internet connection. Showing cached weather data...';
+
+        const city = document.getElementById('city').value;
+        const weatherData = localStorage.getItem(city);
+
+        if (weatherData) {
+          const parsedWeatherData = JSON.parse(weatherData);
+          updateWeather(parsedWeatherData);
+        }
+      }
+
+      window.addEventListener('offline', handleOfflineMode);
+
+      window.addEventListener('online', () => {
+        const currentCity = 'Mesa'; // Default city if no data is stored
+        const weatherData = localStorage.getItem(currentCity);
+
+        if (weatherData) {
+          const parsedWeatherData = JSON.parse(weatherData);
+          const isOutdated = isDataOutdated(parsedWeatherData);
+
+          if (!isOutdated) {
+            updateWeather(parsedWeatherData);
+          } else {
+            // Fetch new weather data if the stored data is outdated
+            getWeather(currentCity);
+          }
+        }
+      });
+    </script>
+  
+</body>
+
+</html>

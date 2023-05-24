@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weather Data Display</title>
+</head>
+<body>
+    <h1>Weather Data</h1>
+
+    <form id="searchForm">
+        <label for="cityInput">Enter City:</label>
+        <input type="text" id="cityInput" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <table id="weatherTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Location</th>
+                <th>Temperature</th>
+                <th>Humidity</th>
+                <th>Wind</th>
+                <th>Pressure</th>
+            </tr>
+        </thead>
+        <tbody id="weatherTableBody"></tbody>
+    </table>
+
+    <div id="errorMessage"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchForm = document.getElementById('searchForm');
+            var cityInput = document.getElementById('cityInput');
+            var tableBody = document.getElementById('weatherTableBody');
+            var errorMessage = document.getElementById('errorMessage');
+
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent form submission
+
+                var city = cityInput.value.trim(); // Get the entered city
+
+                fetch('weather.php?city=' + encodeURIComponent(city)) // Append city as query parameter
+                    .then(response => response.json())
+                    .then(data => {
+                        tableBody.innerHTML = ''; // Clear previous data
+                        errorMessage.textContent = ''; // Clear previous error message
+
+                        if (data.length > 0) {
+                            data.forEach(item => {
+                                var row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${item.date}</td>
+                                    <td>${item.location}</td>
+                                    <td>${item.temperature}</td>
+                                    <td>${item.humidity}</td>
+                                    <td>${item.wind}</td>
+                                    <td>${item.pressure}</td>
+                                `;
+                                tableBody.appendChild(row);
+                            });
+                        } else {
+                            errorMessage.textContent = 'No weather data available.';
+                        }
+                    })
+                    .catch(error => {
+                        errorMessage.textContent = 'Error occurred while fetching weather data.';
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

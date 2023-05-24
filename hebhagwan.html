@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Data</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+<body>
+    <form id="search-form" method="get" action="">
+        <input type="text" name="city" placeholder="Enter a city" value="Mesa">
+        <input type="submit" value="Search">
+    </form>
+    <br><br>
+
+    <table id="weather-table">
+        <tr>
+            <th>Date</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+            <th>Wind Speed</th>
+            <th>Pressure</th>
+        </tr>
+    </table>
+
+    <script>
+        // Check if the data exists in localStorage
+        const storedData = localStorage.getItem('weatherData');
+
+        if (storedData) {
+            // Data exists in localStorage
+            console.log('Data Accessed from Local Storage');
+
+            // Parse the stored data
+            const data = JSON.parse(storedData);
+
+            // Use the data as needed
+            console.log(data);
+
+            // Display the data in the HTML table
+            displayWeatherData(data);
+        } else {
+            // Data doesn't exist in localStorage
+            console.log('No data available in Local Storage');
+
+            // Fetch data from API and store it in localStorage
+            fetchWeatherData('Mesa');
+        }
+
+        // Fetch weather data from API
+        function fetchWeatherData(city) {
+    const apiKey = 'f2d3250979dd69e544ddafb8ed2e7225';
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Data Fetched:', data);
+
+            // Store the fetched data in localStorage
+            localStorage.setItem('weatherData', JSON.stringify(data));
+
+            // Display the data in the HTML table
+            displayWeatherData(data);
+        })
+        .catch(error => {
+            console.error('Error fetching weather data:', error);
+        });
+}
+
+function displayWeatherData(data) {
+    const tableBody = document.getElementById('weather-table');
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().split('T')[0];
+
+    const temperature = data.main.temp;
+    const humidity = data.main.humidity;
+    const windSpeed = data.wind.speed;
+    const pressure = data.main.pressure;
+
+    const row = document.createElement('tr');
+    row.innerHTML = `
+        <td>${formattedDate}</td>
+        <td>${temperature}</td>
+        <td>${humidity}</td>
+        <td>${windSpeed}</td>
+        <td>${pressure}</td>
+    `;
+    tableBody.appendChild(row);
+}
+
+// Rest of the code...
+
+
+
+        // Add event listener for form submission
+        const searchForm = document.getElementById('search-form');
+        searchForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const city = searchForm.elements.city.value;
+            fetchWeatherData(city);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <link rel="stylesheet" href="BibekTimalsina_2331017.css">
+    <div class="container2">
+    <a href="index.html"><button class="btn"> here to view past 7 days data</button></a>
+    </div>
+    <style>
+       .container2 .btn{
+            margin-top:30px;
+            float: right;
+            background-color: rgb(83, 132, 34);
+            border: 1px solid black;
+            border-radius: 20px;
+        }
+        .container2{
+        display:flex; 
+        height: 0px;
+    }
+    
+
+    </style>
+    
+</head>
+<body>
+    
+    <div class="container">
+          <h1>Weather Forecast</h1>
+          <div class="date-time">
+            <span id="date"></span>
+            <span id="time"></span>
+          </div>
+        <div class="location">
+            <label for="city">City:</label>
+            <input type="text" id="city" name="city" placeholder="Enter city name">
+            <button id="submit">Get Weather</button>
+        </div>
+        <div class="weather-info">
+            <div class="temperature">
+                <img src="" alt="Weather Icon">
+                <span id="temp"></span>
+                <span>&deg;F</span>
+            </div>
+            <div class="conditions">
+                <span id="conditions"></span>
+            </div>
+            <div class="humidity">
+                <span>Humidity:</span>
+                <span id="humidity"></span>
+            </div>
+            <div class="wind-speed">
+                <span>Wind Speed:</span>
+                <span id="wind-speed"></span>
+            </div>
+        </div>
+    </div>
+    <script src="BibekTimalsina_2331017.js"></script>
+
+    
+</body>
+</html>
